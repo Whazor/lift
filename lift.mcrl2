@@ -18,12 +18,16 @@ act deursensor_trigger;
   knop_deur_dicht;
   lift_oproep: Verdieping;
 
-proc
-  LiftController(tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling, deur: Deur) =
-  	sum v:Verdieping.lift_oproep(v).LiftController(tedoen = tedoen + {v}) +
-  	sum v:Verdieping.verdieping_verzoek(v).LiftController(tedoen = tedoen + {v}) +
-  	knop_deur_open. (versnelling == stilstaan) -> lift_deur_open . verdieping_deur_open(etage_1) . LiftController(deur=open) <> LiftController() +
-  	knop_deur_dicht. (versnelling == stilstaan) -> lift_deur_dicht . verdieping_deur_dicht(etage_1) . LiftController(deur=gesloten) <> LiftController();
+proc DeurController(versnelling: Versnelling, deur: Deur) =
+  	knop_deur_open. (versnelling == stilstaan && deur == gesloten) -> lift_deur_open . verdieping_deur_open(etage_1) . DeurController(deur=open) <> DeurController() +
+  	knop_deur_dicht. (versnelling == stilstaan && deur == open) -> lift_deur_dicht . verdieping_deur_dicht(etage_1) . DeurController(deur=gesloten) <> DeurController();
 
+proc
+  BeheerPaneel(tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling) =
+  	sum v:Verdieping.lift_oproep(v).BeheerPaneel(tedoen = tedoen + {v}) +
+  	sum v:Verdieping.verdieping_verzoek(v).BeheerPaneel(tedoen = tedoen + {v});
+
+proc LiftController(tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling, deur: Deur) =
+  BeheerPaneel(tedoen, richting, versnelling) || DeurController(versnelling, deur);
 
 init LiftController({}, boven, stilstaan, gesloten);
