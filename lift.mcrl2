@@ -1,5 +1,7 @@
 sort Verdieping = struct etage_1 | etage_2 | etage_3 | etage_4; % | etage_5 | etage_6;
 sort Richting = struct boven | beneden;
+sort Versnelling = struct stilstaan | versnellen | vertragen | constant;
+sort Deur = struct open | gesloten;
 
 act deursensor_trigger;
   lift_benadert: Verdieping;
@@ -10,18 +12,18 @@ act deursensor_trigger;
   accelereer: Richting;
   vertraag;
   verdieping_verzoek: Verdieping;
-  trigger_sos_knop;
-  stop_sos;
-  deur_open;
-  deur_dicht;
+  knop_trigger_sos;
+  knop_stop_sos;
+  knop_deur_open;
+  knop_deur_dicht;
   lift_oproep: Verdieping;
 
 proc
-  LiftController(todo: Set(Verdieping)) =
-  	sum v:Verdieping.lift_oproep(v).LiftController(todo + {v}) +
-  	sum v:Verdieping.verdieping_verzoek(v).LiftController(todo + {v}) +
-  	deur_open.LiftController(todo);
+  LiftController(tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling, deur: Deur) =
+  	sum v:Verdieping.lift_oproep(v).LiftController(tedoen = tedoen + {v}) +
+  	sum v:Verdieping.verdieping_verzoek(v).LiftController(tedoen = tedoen + {v}) +
+  	knop_deur_open. (versnelling == stilstaan) -> lift_deur_open . verdieping_deur_open(etage_1) . LiftController(deur=open) <> LiftController() +
+  	knop_deur_dicht. (versnelling == stilstaan) -> lift_deur_dicht . verdieping_deur_dicht(etage_1) . LiftController(deur=gesloten) <> LiftController();
 
 
-
-init LiftController({});
+init LiftController({}, boven, stilstaan, gesloten);
