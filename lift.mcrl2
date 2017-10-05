@@ -1,0 +1,27 @@
+sort Verdieping = struct etage_1 | etage_2 | etage_3 | etage_4; % | etage_5 | etage_6;
+sort Richting = struct boven | beneden;
+
+act deursensor_trigger;
+  lift_benadert: Verdieping;
+  lift_deur_open;
+  lift_deur_dicht;
+  verdieping_deur_open: Verdieping;
+  verdieping_deur_dicht: Verdieping;
+  accelereer: Richting;
+  vertraag;
+  verdieping_verzoek: Verdieping;
+  trigger_sos_knop;
+  stop_sos;
+  deur_open;
+  deur_dicht;
+  lift_oproep: Verdieping;
+
+proc
+  LiftController(todo: Set(Verdieping)) =
+  	sum v:Verdieping.lift_oproep(v).LiftController(todo + {v}) +
+  	sum v:Verdieping.verdieping_verzoek(v).LiftController(todo + {v}) +
+  	deur_open.LiftController(todo);
+
+
+
+init LiftController({});
