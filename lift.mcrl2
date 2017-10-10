@@ -17,7 +17,19 @@ act deursensor_trigger;
   knop_deur_open;
   knop_deur_dicht;
   lift_oproep: Verdieping;
+  % tussen schachtmotor en strategie
   s_stop_bij, r_stop_bij, c_stop_bij: Verdieping;
+  s_accelereer, r_accelereer, c_accelereer: Richting;
+  % schachtmotor, deuren en strategie
+  s_stilstaan, r_stilstaan1, r_stilstaan2, c_stilstaan;
+  % schachtmotor en deuren
+  s_lift_deur_open, r_lift_deur_open, c_lift_deur_open;
+  s_lift_deur_dicht, r_lift_deur_dicht, c_lift_deur_dicht;
+  % beheerpaneel
+  s_verzoek_afgehandeld, r_verzoek_afgehandeld, c_verzoek_afgehandeld;
+  s_verdieping_verzoek, r_verdieping_verzoek, c_verdieping_verzoek;
+  s_lift_oproep, r_lift_oproep, c_lift_oproep;
+  
 
 proc StrategieComponent(versnelling: Versnelling, richting: Richting) =
     (versnelling == stilstaan) -> sum v: Verdieping.lift_benadert(v).s_stop_bij(etage_2).StrategieComponent();
