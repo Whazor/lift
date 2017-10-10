@@ -1,6 +1,6 @@
 sort Verdieping = struct etage_1 | etage_2 | etage_3 | etage_4; % | etage_5 | etage_6;
 sort Richting = struct boven | beneden;
-sort Versnelling = struct stilstaan | versnellen | vertragen | constant;
+sort Versnelling = struct stilstaan | constant;
 sort Deur = struct open | gesloten;
 
 act deursensor_trigger;
@@ -18,6 +18,15 @@ act deursensor_trigger;
   knop_deur_dicht;
   lift_oproep: Verdieping;
 
+
+proc StrategyController(versnelling: Versnelling, richting: Richting) =
+    (versnelling == stilstaan) -> sum v: Verdieping.lift_benadert(v).S_stop_bij(2).StrategyController() <> StrategyController();
+
+proc SchachtMotor(versnelling: Versnelling, richting: Richting) =
+    (versnelling == stilstaan) -> sum r:Richting.accelereer(r).SchachtMotor(versnelling = constant, richting = r) <> SchachtMotor() +
+    vertraag.SchachtMotor(versnelling = stilstaan) +
+    R_stop_bij(z).SchachtMotor();
+
 proc DeurController(versnelling: Versnelling, deur: Deur) =
   	knop_deur_open. (versnelling == stilstaan && deur == gesloten) -> lift_deur_open . verdieping_deur_open(etage_1) . DeurController(deur=open) <> DeurController() +
   	knop_deur_dicht. (versnelling == stilstaan && deur == open) -> lift_deur_dicht . verdieping_deur_dicht(etage_1) . DeurController(deur=gesloten) <> DeurController();
@@ -30,4 +39,7 @@ proc
 proc LiftController(tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling, deur: Deur) =
   BeheerPaneel(tedoen, richting, versnelling) || DeurController(versnelling, deur);
 
-init LiftController({}, boven, stilstaan, gesloten);
+  init allow({C_stop_bij},
+         comm({S_stop_bij|R_stop_bij->C_stop_bij},
+           LiftController({}, boven, stilstaan, gesloten)
+       ));
