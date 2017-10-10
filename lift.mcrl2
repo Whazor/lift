@@ -17,30 +17,30 @@ act deursensor_trigger;
   knop_deur_open;
   knop_deur_dicht;
   lift_oproep: Verdieping;
-  s_stop_bij: Verdieping;
-  r_stop_bij: Verdieping;
-  c_stop_bij: Verdieping;
+  s_stop_bij, r_stop_bij, c_stop_bij: Verdieping;
 
+proc StrategieComponent(versnelling: Versnelling, richting: Richting) =
+    (versnelling == stilstaan) -> sum v: Verdieping.lift_benadert(v).s_stop_bij(etage_2).StrategieComponent();
 
-proc StrategyController(versnelling: Versnelling, richting: Richting) =
-    (versnelling == stilstaan) -> sum v: Verdieping.lift_benadert(v).s_stop_bij(etage_2).StrategyController() <> StrategyController();
+proc SchachtMotor(huidige_verdieping: Verdieping, stop_bij: Verdieping, versnelling: Versnelling, richting: Richting) =
+      (versnelling == stilstaan) -> sum r:Richting.accelereer(r).SchachtMotor(versnelling = constant, richting = r)
+    + (versnelling == constant) -> vertraag.SchachtMotor(versnelling = stilstaan)
+    + sum v:Verdieping.r_stop_bij(v).SchachtMotor();
 
-proc SchachtMotor(versnelling: Versnelling, richting: Richting) =
-    (versnelling == stilstaan) -> sum r:Richting.accelereer(r).SchachtMotor(versnelling = constant, richting = r) <> SchachtMotor() +
-    vertraag.SchachtMotor(versnelling = stilstaan) +
-    sum v:Verdieping.r_stop_bij(v).SchachtMotor();
-
-proc DeurController(versnelling: Versnelling, deur: Deur) =
-  	knop_deur_open. (versnelling == stilstaan && deur == gesloten) -> lift_deur_open . verdieping_deur_open(etage_1) . DeurController(deur=open) <> DeurController() +
-  	knop_deur_dicht. (versnelling == stilstaan && deur == open) -> lift_deur_dicht . verdieping_deur_dicht(etage_1) . DeurController(deur=gesloten) <> DeurController();
+proc DeurenComponent(versnelling: Versnelling, deur: Deur) =
+  	knop_deur_open. (versnelling == stilstaan && deur == gesloten) -> lift_deur_open . verdieping_deur_open(etage_1) . DeurenComponent(deur=open) <> DeurenComponent() +
+  	knop_deur_dicht. (versnelling == stilstaan && deur == open) -> lift_deur_dicht . verdieping_deur_dicht(etage_1) . DeurenComponent(deur=gesloten) <> DeurenComponent();
 
 proc
   BeheerPaneel(tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling) =
   	sum v:Verdieping.lift_oproep(v).BeheerPaneel(tedoen = tedoen + {v}) +
   	sum v:Verdieping.verdieping_verzoek(v).BeheerPaneel(tedoen = tedoen + {v});
 
-proc LiftController(tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling, deur: Deur) =
-  BeheerPaneel(tedoen, richting, versnelling) || DeurController(versnelling, deur);
+proc LiftController(huidige_verdieping: Verdieping, tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling, deur: Deur) =
+  BeheerPaneel(tedoen, richting, versnelling) ||
+  DeurenComponent(versnelling, deur) ||
+  SchachtMotor(huidige_verdieping, huidige_verdieping, versnelling, richting) ||
+  StrategieComponent(versnelling, richting);
 
   init allow({
     deursensor_trigger,
@@ -59,5 +59,5 @@ proc LiftController(tedoen: Set(Verdieping), richting: Richting, versnelling: Ve
     lift_oproep,
     c_stop_bij},
          comm({s_stop_bij|r_stop_bij->c_stop_bij},
-           LiftController({}, boven, stilstaan, gesloten)
+           LiftController(etage_1, {}, boven, stilstaan, gesloten)
        ));
