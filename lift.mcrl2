@@ -11,6 +11,10 @@ eqn niet_verder(etage_3, beneden) = false;
 eqn niet_verder(etage_4, beneden) = false;
 eqn niet_verder(etage_4, boven) = true;
 
+eqn etage_1 < etage_2 = true;
+eqn etage_2 < etage_3 = true;
+eqn etage_3 < etage_4 = true;
+
 sort Richting = struct boven | beneden;
 
 map next: Verdieping # Richting -> Verdieping;
@@ -63,15 +67,15 @@ act deursensor_trigger;
 %%%%%%%
 
 proc DeurenComponent(versnelling: Versnelling, deur: Deur, verdieping: Verdieping) =
-  	knop_deur_open. (versnelling == stilstaan && deur == gesloten) -> lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open) <> DeurenComponent() +
-  	knop_deur_dicht. (versnelling == stilstaan && deur == open) -> lift_deur_dicht . verdieping_deur_dicht(verdieping) . DeurenComponent(deur=gesloten) <> DeurenComponent() +
+  	knop_deur_open . (versnelling == stilstaan && deur == gesloten) -> lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open) <> DeurenComponent() +
+  	knop_deur_dicht . (versnelling == stilstaan && deur == open) -> lift_deur_dicht . verdieping_deur_dicht(verdieping) . DeurenComponent(deur=gesloten) <> DeurenComponent() +
     r_accelereer . DeurenComponent(versnelling=constant) +
     sum v: Verdieping . r_stilstaan2(v) . lift_deur_open . verdieping_deur_open(v) . DeurenComponent(versnelling=stilstaan,verdieping=v,deur=open);
 
 %%%%%%%
 
 proc StrategieComponent(versnelling: Versnelling, richting: Richting, verdieping:Verdieping) =
-    (versnelling == stilstaan) -> sum v: Verdieping.s_stop_bij(v).s_gaan(boven).StrategieComponent() +
+    sum v: Verdieping.(versnelling == stilstaan && verdieping != v) -> s_stop_bij(v).s_gaan(if(v < verdieping, beneden, boven)).StrategieComponent(versnelling=constant) +
     (versnelling == constant) -> sum v:Verdieping. r_stilstaan1(v) . StrategieComponent(versnelling=stilstaan, verdieping=v);
 
 %%%%%%%
