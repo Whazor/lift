@@ -88,7 +88,7 @@ proc StrategieComponent(versnelling: Versnelling, richting: Richting, verdieping
 
 proc SchachtMotor(gaan:Bool, huidig: Verdieping, stop_bij: Verdieping, deur: Deur, versnelling: Versnelling, richting: Richting) =
     sum v:Verdieping . sum new_richting: Richting . r_gaan(v, new_richting) . SchachtMotor(stop_bij = v, gaan = true, richting = new_richting)
-    + (gaan && versnelling == stilstaan && deur == gesloten) -> accelereer(richting).SchachtMotor(versnelling = constant, richting = richting)
+    + (gaan && versnelling == stilstaan && deur == gesloten) -> s_accelereer. accelereer(richting).SchachtMotor(versnelling = constant, richting = richting)
     + r_lift_deur_open . SchachtMotor(deur = open)
     + r_lift_deur_dicht . SchachtMotor(deur = gesloten)
     % lift_benadert sensor afvangen
@@ -107,7 +107,15 @@ proc LiftController(huidige_verdieping: Verdieping, tedoen: Set(Verdieping), ric
   SchachtMotor(false, huidige_verdieping, huidige_verdieping, deur, versnelling, richting) ||
   StrategieComponent(versnelling, richting, huidige_verdieping, tedoen);
 
-  init allow({
+  init hide({
+    c_gaan,
+    c_stilstaan,
+    c_lift_deur_open,
+    c_lift_deur_dicht,
+    c_verzoek_afgehandeld,
+    c_verdieping_verzoek
+  }
+    ,allow({
     deursensor_trigger,
     lift_benadert,
     lift_deur_open,
@@ -144,4 +152,4 @@ proc LiftController(huidige_verdieping: Verdieping, tedoen: Set(Verdieping), ric
            %s_lift_oproep|r_lift_oproep->c_lift_oproep
            },
            LiftController(etage_1, {}, boven, stilstaan, gesloten)
-       ));
+       )));
