@@ -110,6 +110,7 @@ proc LiftController(huidige_verdieping: Verdieping, tedoen: Set(Verdieping), ric
 
   init hide({
     c_gaan,
+    c_accelereer,
     c_stilstaan,
     c_lift_deur_open,
     c_lift_deur_dicht,
@@ -134,6 +135,7 @@ proc LiftController(huidige_verdieping: Verdieping, tedoen: Set(Verdieping), ric
     knop_deur_dicht,
     %c_stop_bij,
     c_gaan,
+    c_accelereer,
     c_stilstaan,
     c_lift_deur_open,
     c_lift_deur_dicht,
