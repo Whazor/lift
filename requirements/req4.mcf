@@ -1,1 +1,4 @@
-forall v:Verdieping . [true*.lift_benadert(v)]<vertraag>(<verdieping_deur_open(v).lift_deur_open>true || <lift_deur_open.verdieping_deur_open(v)>true)
+forall v:Verdieping .
+  [true*.lift_benadert(v).vertraag]<tau*>(
+   <verdieping_deur_open(v).tau*.lift_deur_open>true ||
+   <lift_deur_open.tau*.verdieping_deur_open(v)>true)
