@@ -62,7 +62,7 @@ act deursensor_trigger;
 
 %%%%%%%
   proc
-    BeheerPaneel(richting: Richting, versnelling: Versnelling) =
+    BeheerPaneel =
     	sum v:Verdieping.knop_verdieping(v).s_verdieping_verzoek(v).BeheerPaneel() +
     	%sum v:Verdieping.verdieping_verzoek(v).s_verdieping_verzoek(v).BeheerPaneel() +
       sum v:Verdieping.r_verzoek_afgehandeld(v).BeheerPaneel();
@@ -74,8 +74,8 @@ proc DeurenComponent(versnelling: Versnelling, deur: Deur, verdieping: Verdiepin
   	knop_deur_open . (versnelling == stilstaan && deur == gesloten) -> s_lift_deur_open . lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open) <> DeurenComponent() +
   	knop_deur_dicht . (versnelling == stilstaan && deur == open) -> lift_deur_dicht . verdieping_deur_dicht(verdieping) . s_lift_deur_dicht . DeurenComponent(deur=gesloten) <> DeurenComponent() +
     r_accelereer . DeurenComponent(versnelling=constant) +
-    sum v: Verdieping . r_stilstaan2(v) . s_lift_deur_open. lift_deur_open . verdieping_deur_open(v) . s_verzoek_afgehandeld(v) . DeurenComponent(versnelling=stilstaan,verdieping=v,deur=open) +
-    deursensor_trigger . lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent();
+    sum v: Verdieping . r_stilstaan2(v) . s_lift_deur_open. lift_deur_open . verdieping_deur_open(v) . s_verzoek_afgehandeld(v) . DeurenComponent(versnelling=stilstaan,verdieping=v,deur=open);
+    %+ deursensor_trigger . lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent();
 
 %%%%%%%
 
@@ -103,7 +103,7 @@ proc SchachtMotor(gaan:Bool, huidig: Verdieping, stop_bij: Verdieping, deur: Deu
 
 %%%%%%%
 proc LiftController(huidige_verdieping: Verdieping, tedoen: Set(Verdieping), richting: Richting, versnelling: Versnelling, deur: Deur) =
-  BeheerPaneel(richting, versnelling) ||
+  BeheerPaneel() ||
   DeurenComponent(versnelling, deur, huidige_verdieping) ||
   SchachtMotor(false, huidige_verdieping, huidige_verdieping, deur, versnelling, richting) ||
   StrategieComponent(versnelling, richting, huidige_verdieping, tedoen);
