@@ -1,0 +1,3 @@
+forall v:Verdieping . [true*][lift_benadert(v)]<vertraag><lift_deur_open>
+  forall r:Richting . [!accelereer(r)]
+    forall v2:Verdieping . [verdieping_deur_open(v2)] val (v==v2)

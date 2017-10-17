@@ -1,0 +1,11 @@
+% Wanneer de lift op een verdieping hoort te stoppen dan mag de lift de verdieping niet passeren.
+% Wanneer een knop_verdieping(v) actie gebeurt is, dan na een lift_benadert(v) actie moet er direct een vertraag volgen, indien de verdieping niet de huidige betreft.
+
+% Voor alle verdiepingen v na een knop_verdieping(v) actie, geldt dat de lift een vertraag actie moet uitvoeren indien er een lift_benadert(v) actie plaatsvind.
+
+% Sequence: knop_verdieping(v) -> interne acties (verdieping_verzoek, verzoek_afgehandeld, gaan) -> accelereer(boven) of accelereer(beneden) -> lift_benadert(v) ->
+% vertraag -> interne acties (stilstaan)
+forall v:Verdieping .
+    [true* . knop_verdieping(v) . tau* . (accelereer(boven) + accelereer(beneden)) . lift_benadert(v)]<vertraag><tau*>true
+    
+%nu X(v: Verdieping = etage_1)
