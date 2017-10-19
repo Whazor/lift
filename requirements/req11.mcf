@@ -1,0 +1,39 @@
+% Wanneer de lift-en verdiepingsdeuren gesloten zijn en er verdiepingsverzoeken gedaan zijn, dan zal de lift acceleren.
+
+% Na verdieping_verzoek(v) of lift_oproep(v):
+%  als v > de huidige verdieping accelereer(boven)
+%  als v < huidige verdieping accelereer(beneden)
+
+% todo: Set(Verdieping) = {},
+% nu X(best: Pos = 0, huidig: Verdieping = etage_1, deur: Deur = gesloten) .
+%   (forall knop_v:Verdieping.[knop_verdieping(knop_v)] val (huidig != knop_v) => X(best+1, huidig, deur)) &&
+%
+%   forall ben_v:Verdieping.[verdieping_deur_open(ben_v)] X(best-1, ben_v, deur) &&
+%
+%
+%   [lift_deur_dicht] X(best, huidig, gesloten) &&
+%   [lift_deur_open] X(best, huidig, open) &&
+%
+%   exists ver1:Verdieping, ver2:Verdieping.[ !knop_verdieping(ver1) && !verdieping_deur_open(ver2) && !lift_deur_open && !lift_deur_dicht] X(best, huidig, deur) &&
+%   exists r:Richting.<tau*.accelereer(r)> val (deur==gesloten && best != 0)
+
+% assuming req10, req4
+
+nu X (
+  %todo: Set(Verdieping) = {},
+    huidig: Verdieping = etage_1,
+    deur: Deur = gesloten,
+    sos: Bool = false) .
+  % het onthouden van alle verdiepingsverzoeken
+  %forall knop_v:Verdieping.[knop_verdieping(knop_v)] X(todo + {knop_v}-{huidig}, huidig, deur) &&
+  % het bezoeken van verdiepingen
+  forall ben_v:Verdieping.[verdieping_deur_open(ben_v)] X(ben_v, deur,sos) &&
+
+  % onthouden van deuren
+  [knop_stop_sos] X(huidig, deur, !sos) &&
+  [lift_deur_dicht] X(huidig, gesloten, sos) &&
+  [lift_deur_open] X(huidig, open, sos) &&
+  % alle overige acties
+  exists ver1:Verdieping.[!knop_stop_sos&& !verdieping_deur_open(ver1) && !lift_deur_open && !lift_deur_dicht] X(huidig, deur, sos) &&
+
+  exists r:Richting.<tau*.accelereer(r)> val (deur==gesloten&&huidig!=etage_1&&!sos)
