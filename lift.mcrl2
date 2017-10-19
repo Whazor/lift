@@ -62,16 +62,16 @@ act deursensor_trigger;
 
 %%%%%%%
   proc
-    BeheerPaneel =
-    	sum v:Verdieping.knop_verdieping(v).s_verdieping_verzoek(v).BeheerPaneel() +
-      sum v:Verdieping.r_verzoek_afgehandeld(v).BeheerPaneel();
+    BeheerPaneel(tedoen: Set(Verdieping), huidig: Verdieping) =
+      sum v:Verdieping.!(v in tedoen) -> (v != huidig) -> knop_verdieping(v).s_verdieping_verzoek(v).BeheerPaneel(tedoen + {v}, huidig) +
+      sum v:Verdieping.r_verzoek_afgehandeld(v).BeheerPaneel(tedoen - {v}, v);
 
 
 %%%%%%%
 
 proc DeurenComponent(opengaan: Bool, versnelling: Versnelling, deur: Deur, verdieping: Verdieping) =
-  	knop_deur_open . (versnelling == stilstaan && deur == gesloten) -> s_lift_deur_open . lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open) <> DeurenComponent()
-  	+ knop_deur_dicht . (versnelling == stilstaan && deur == open) -> lift_deur_dicht . verdieping_deur_dicht(verdieping) . s_lift_deur_dicht . DeurenComponent(deur=gesloten) <> DeurenComponent()
+  	 (versnelling == stilstaan && deur == gesloten) -> knop_deur_open . s_lift_deur_open . lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open)
+  	+ (versnelling == stilstaan && deur == open) -> knop_deur_dicht . lift_deur_dicht . verdieping_deur_dicht(verdieping) . s_lift_deur_dicht . DeurenComponent(deur=gesloten)
     + r_accelereer . DeurenComponent(versnelling=constant)
     + sum v: Verdieping . r_stilstaan2(v) . DeurenComponent(versnelling=stilstaan,verdieping=v,opengaan=true)
     + (opengaan && versnelling == stilstaan && deur==gesloten) -> s_lift_deur_open. lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open)
@@ -106,13 +106,12 @@ proc SchachtMotor(gaan:Bool, sos:Bool, huidig: Verdieping, stop_bij: Verdieping,
           vertraag.s_stilstaan(next(huidig, richting)).SchachtMotor(gaan = false, deur=open, versnelling = stilstaan, huidig=next(huidig, richting))
           <> SchachtMotor(huidig=next(huidig, richting))
     + (!sos && versnelling == constant) -> knop_trigger_sos .vertraag . SchachtMotor(versnelling=stilstaan, sos=true)
-    + (!sos && versnelling == stilstaan) -> knop_trigger_sos . SchachtMotor(versnelling=stilstaan, sos=true)
     + (sos) -> knop_trigger_sos . SchachtMotor(versnelling=stilstaan, sos=false);
 
 
 %%%%%%%
 proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnelling: Versnelling, deur: Deur) =
-  BeheerPaneel() ||
+  BeheerPaneel({}, huidige_verdieping) ||
   DeurenComponent(false, versnelling, deur, huidige_verdieping) ||
   SchachtMotor(false, false, huidige_verdieping, huidige_verdieping, deur, versnelling, richting) ||
   StrategieComponent({},versnelling, richting, huidige_verdieping);
