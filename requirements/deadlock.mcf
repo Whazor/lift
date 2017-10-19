@@ -1,2 +1,3 @@
 % problem, we should somehow exclude the buttons, because you can always do button actions
 [true*]<true>true
+% [true*.(knop_verdieping(etage_1)||knop_verdieping(etage_2)||knop_verdieping(etage_3)||knop_verdieping(etage_4)||knop_trigger_sos||knop_stop_sos||knop_deur_open||knop_deur_dicht)]<!(knop_verdieping(etage_1)||knop_verdieping(etage_2)||knop_verdieping(etage_3)||knop_verdieping(etage_4)||knop_trigger_sos||knop_stop_sos||knop_deur_open||knop_deur_dicht)>true

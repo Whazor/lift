@@ -1,3 +1,5 @@
+%Wanneer de lift op een verdieping tot stilstand komt, worden de deuren geopend door de deurmotoren.
+
 forall v:Verdieping .
   [true*.lift_benadert(v).vertraag]<tau*>(
    <verdieping_deur_open(v).tau*.lift_deur_open>true ||

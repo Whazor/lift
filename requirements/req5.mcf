@@ -1,0 +1,5 @@
+% Wanneer de SOS knop getriggered wordt, worden alle motoren uitgeschakeld.
+
+nu X.
+  [!knop_stop_sos]X &&
+  [knop_stop_sos]<vertraag.exists r:Richting.!(knop_stop_sos && !accelereer(r))*.knop_stop_sos>true
