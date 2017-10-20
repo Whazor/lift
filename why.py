@@ -6,7 +6,9 @@ import sys, subprocess, re
 store = []
 highest = -1
 for i, line in enumerate(sys.stdin):
+    print(line.lstrip().rstrip())
     if line.lstrip().rstrip() == 'false' or line.lstrip().rstrip().startswith('0: '):
+        print("skip")
         continue
     length = len(line) - len(line.lstrip())
     improved = line
@@ -21,6 +23,7 @@ for i, line in enumerate(sys.stdin):
                 break
     store.append((length, improved))
     highest = length
+print(store[0])
 print(len(store))
 
 ###
@@ -34,7 +37,8 @@ text = child.before
 
 options = list(filter(None,text.split('initial state: ')[1].split('\n')))[1:]
 # print(store[0][1])
-for (length, line) in store[1:]:
+tried_skipping = False
+for (length, line) in store:
     should_be = line.lstrip().rstrip()
     if should_be == 'False':
         break
@@ -54,11 +58,19 @@ for (length, line) in store[1:]:
             child.expect('\?')
             text = child.before
             options = list(filter(None,text.split('current state: ')[1].split('\n')))[1:]
+            tried_skipping = False
             break
     if not done:
+        print("ERROR: did not find next statement")
         for option in options:
             print(option)
-        sys.exit(1)
+        print("try skipping")
+        if not tried_skipping:
+            tried_skipping = True
+            continue
+        else:
+            sys.exit(1)
+
 
 ###
 ### save the trace
