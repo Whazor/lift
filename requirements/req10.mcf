@@ -1,0 +1,40 @@
+%TODO WEKRT NOG NIET
+
+
+% Een lift gaat automatisch naar de onderste verdieping wanneer geen verdiepingen zijn om heen te gaan.
+%
+% Wanneer alle acties van verdieping_verzoek(verdieping) en lift_verzoek(verdieping) zijn gevolgd door een verdieping_deur_open(verdieping), dan komt er uiteindelijk een verdieping_deur_open(0)
+
+nu X (
+  to_etage_1: Bool = false,
+  to_etage_2: Bool = false,
+  to_etage_3: Bool = false,
+  to_etage_4: Bool = false,
+  deur: Bool = false
+  ) .
+[knop_verdieping(etage_1)]X(true, to_etage_2, to_etage_3, to_etage_4, deur) &&
+[knop_verdieping(etage_2)]X(to_etage_1, true, to_etage_3, to_etage_4, deur) &&
+[knop_verdieping(etage_3)]X(to_etage_1, to_etage_2, true, to_etage_4, deur) &&
+[knop_verdieping(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, true, deur) &&
+
+[verdieping_deur_open(etage_1)]X(false, to_etage_2, to_etage_3, to_etage_4, true) &&
+[verdieping_deur_open(etage_2)]X(to_etage_1, false, to_etage_3, to_etage_4, true) &&
+[verdieping_deur_open(etage_3)]X(to_etage_1, to_etage_2, false, to_etage_4, true) &&
+[verdieping_deur_open(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, false, true) &&
+
+[lift_deur_open]X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, true) &&
+[lift_deur_dicht]X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, false) &&
+
+exists ver1:Verdieping.exists ver2:Verdieping.
+  [!verdieping_deur_open(ver1) &&
+   !knop_verdieping(ver2) &&
+   !lift_deur_open &&
+   !lift_deur_dicht] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, deur) &&
+
+forall v:Verdieping.
+  [verdieping_deur_dicht(v)]<(!lift_benadert(etage_1) && !knop_verdieping(etage_1))*>
+  <lift_benadert(etage_1).vertraag>val (v != etage_1 || !to_etage_1 || !to_etage_2 || !to_etage_3 || !to_etage_4)
+
+% [lift_deur_dicht.(!lift_benadert(etage_1) && !knop_verdieping(etage_1))*]<lift_benadert(etage_1).vertraag>true
+%   [verdieping_deur_dicht(v)]<>
+%   <lift_benadert(etage_1).vertraag>val (to_etage_1 || to_etage_2 || to_etage_3 || to_etage_4)

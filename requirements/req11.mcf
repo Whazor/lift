@@ -1,3 +1,5 @@
+%TODO WEKRT NOG NIET
+
 % Wanneer de lift-en verdiepingsdeuren gesloten zijn en er verdiepingsverzoeken gedaan zijn, dan zal de lift acceleren.
 
 % Na verdieping_verzoek(v) of lift_oproep(v):
@@ -27,12 +29,14 @@ nu X (
   % het onthouden van alle verdiepingsverzoeken
   %forall knop_v:Verdieping.[knop_verdieping(knop_v)] X(todo + {knop_v}-{huidig}, huidig, deur) &&
   % het bezoeken van verdiepingen
+
   forall ben_v:Verdieping.[verdieping_deur_open(ben_v)] X(ben_v, deur,sos) &&
 
   % onthouden van deuren
   [knop_stop_sos] X(huidig, deur, !sos) &&
   [lift_deur_dicht] X(huidig, gesloten, sos) &&
   [lift_deur_open] X(huidig, open, sos) &&
+
   % alle overige acties
   exists ver1:Verdieping.[!knop_stop_sos&& !verdieping_deur_open(ver1) && !lift_deur_open && !lift_deur_dicht] X(huidig, deur, sos) &&
 
