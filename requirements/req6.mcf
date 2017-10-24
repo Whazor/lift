@@ -5,7 +5,11 @@
 
 % Sequence: knop_verdieping(v) -> interne acties (verdieping_verzoek, verzoek_afgehandeld, gaan) -> accelereer(boven) of accelereer(beneden) -> lift_benadert(v) ->
 % vertraag -> interne acties (stilstaan)
-forall v:Verdieping .
-    [true* . knop_verdieping(v) . tau* . (accelereer(boven) + accelereer(beneden)) . lift_benadert(v)]<vertraag><tau*>true
-    
-%nu X(v: Verdieping = etage_1)
+
+nu X (verd: Verdieping = etage_1) .
+     (forall v:Verdieping .[knop_verdieping(v)] X(v)) &&
+     (exists v:Verdieping .[lift_benadert(v)] X(v)) &&
+     [vertraag](verd == v)
+
+% Todo: Use verd and v such that for every v where you used knop_verdieping(v) you wait until lift_benadert(v) where v==v happened
+% Todo: Exists for the lift_benadert necessary?
