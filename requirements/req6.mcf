@@ -7,10 +7,14 @@
 % vertraag -> interne acties (stilstaan)
 
 nu X (verd: Verdieping = etage_1, tedoen: Set(Verdieping) = {}) .
-                                                         (forall v1:Verdieping .[knop_verdieping(v1)] X(verd, tedoen + {v1} - {verd})) &&
-                                                         (forall v2:Verdieping .[lift_benadert(v2)] X(v2, tedoen)) &&
-                                                         (forall v3:Verdieping.[lift_benadert(v3)]<vertraag>val(v3 in tedoen))  &&
-                                                         (exists ev1:Verdieping.exists ev2:Verdieping.[!knop_verdieping(ev1) && !lift_benadert(ev2) && !lift_deur_open] X(verd, tedoen)) &&
-                                                         [lift_deur_open] X(verd, tedoen - {verd})
-% Todo: Use verd and v such that for every v where you used knop_verdieping(v) you wait until lift_benadert(v) where v==v happened
-% Todo: Exists for the lift_benadert necessary?
+        forall v1:Verdieping.[knop_verdieping(v1)] X(verd, tedoen + {v1} - {verd}) &&
+        forall v2:Verdieping.[lift_benadert(v2)] X(v2, tedoen) &&
+        [lift_deur_open] X(verd, tedoen - {verd}) &&
+
+        forall v3:Verdieping.[lift_benadert(v3)] ( val (v3 in tedoen) => mu Y.([!vertraag]Y && <true>true) ) &&
+
+        (forall ev1:Verdieping.
+          forall ev2:Verdieping.
+           [!knop_verdieping(ev1) &&
+            !lift_benadert(ev2) &&
+            !lift_deur_open] X(verd, tedoen))
