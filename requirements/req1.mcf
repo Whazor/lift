@@ -1,0 +1,15 @@
+
+%De schachtmotoren kunnen alleen aan als alle deuren (zowel van de lift als van de verdiepingen) dicht zijn.
+
+%De schachtmotor kan alleen accelereer(r) of vertraag na lift_deur_dicht en verdieping_deur_dicht(v) gebeurt is en
+%zolang daartussen geen verdieping_deur_open of verdieping_deur_open(v) gebeurt is (v voor alle verdiepingen)
+
+
+%forall v:Verdieping. [true* . (verdieping_deur_open(v) + lift_deur_open) .
+%   forall v2: Verdieping. !(verdieping_deur_dicht(v2))* . !lift_deur_dicht . (accelereer(beneden) + accelereer(boven))]false
+
+
+
+
+forall v:Verdieping. [true* . lift_deur_dicht . verdieping_deur_dicht(v)]
+   exists v2:Verdieping. [verdieping_deur_open(v2) . !(verdieping_deur_dicht(v2))* . (accelereer(beneden) + accelereer(boven))]false
