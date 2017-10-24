@@ -42,7 +42,7 @@ act deursensor_trigger;
   %lift_oproep: Verdieping;
   knop_verdieping: Verdieping;
   knop_trigger_sos;
-  knop_stop_sos;
+  % knop_stop_sos;
   knop_deur_open;
   knop_deur_dicht;
 
@@ -139,7 +139,7 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
     %verdieping_verzoek,
     %lift_oproep,
     knop_trigger_sos,
-    knop_stop_sos,
+    % knop_stop_sos,
     knop_deur_open,
     knop_deur_dicht,
     %c_stop_bij,
