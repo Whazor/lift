@@ -31,12 +31,14 @@ nu X (
       (v != etage_1 && to_etage_1) ||
       (v != etage_2 && to_etage_2) ||
       (v != etage_3 && to_etage_3) ||
-      (v != etage_4 && to_etage_4)) && !sos) =>
-      mu Y.(forall r: Richting.forall kver:Verdieping.[!accelereer(r) && !knop_verdieping(kver) && !knop_trigger_sos]Y && <true>true) ) &&
+      (v != etage_4 && to_etage_4)) &&
+      !sos
+    ) =>
+      mu Y.(forall r: Richting.forall kver:Verdieping.[!accelereer(r) && !knop_verdieping(kver) && !knop_trigger_sos]Y && <true>true) &&
 
-    forall ver1:Verdieping.forall ver2:Verdieping.
-      [!verdieping_deur_open(ver1) &&
-       !knop_trigger_sos &&
-       !knop_verdieping(ver2)] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, sos)
-
+  forall ver1:Verdieping.forall ver2:Verdieping.
+    [!verdieping_deur_open(ver1) &&
+     !knop_trigger_sos &&
+     !knop_verdieping(ver2)] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, sos)
+)
   % exists r:Richting.<tau*.accelereer(r)> val (deur==gesloten&&huidig!=etage_1&&!sos)
