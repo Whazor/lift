@@ -64,8 +64,7 @@ act deursensor_trigger;
   proc
     BeheerPaneel(tedoen: Set(Verdieping), huidig: Verdieping) =
       sum v:Verdieping.!(v in tedoen) -> (v != huidig) -> knop_verdieping(v).s_verdieping_verzoek(v).BeheerPaneel(tedoen + {v}, huidig) +
-      sum v:Verdieping.r_verzoek_afgehandeld(v).BeheerPaneel(tedoen - {v}, v) +
-      (tedoen == {} && huidig != etage_1) -> s_verdieping_verzoek(etage_1).BeheerPaneel({etage_1}, huidig);
+      sum v:Verdieping.r_verzoek_afgehandeld(v).BeheerPaneel(tedoen - {v}, v);
 
 
 %%%%%%%
