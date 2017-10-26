@@ -1,1 +1,3 @@
-./compile.sh; cat lift.lps | lps2pbes -f $1 | pbes2bool $2 | sed '/False$/q'
+Z=$1
+shift
+./compile.sh; cat lift.lps | lps2pbes -f $Z | pbes2bool $@ | sed '/False$/q'
