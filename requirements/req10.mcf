@@ -1,6 +1,5 @@
 %TODO WEKRT NOG NIET
 
-
 % Een lift gaat automatisch naar de onderste verdieping wanneer geen verdiepingen zijn om heen te gaan.
 %
 % Wanneer alle acties van verdieping_verzoek(verdieping) en lift_verzoek(verdieping) zijn gevolgd door een verdieping_deur_open(verdieping), dan komt er uiteindelijk een verdieping_deur_open(0)
@@ -9,31 +8,40 @@ nu X (
   to_etage_1: Bool = false,
   to_etage_2: Bool = false,
   to_etage_3: Bool = false,
-  to_etage_4: Bool = false,
-  deur: Bool = false
-  ) .
-[knop_verdieping(etage_1)]X(true, to_etage_2, to_etage_3, to_etage_4, deur) &&
-[knop_verdieping(etage_2)]X(to_etage_1, true, to_etage_3, to_etage_4, deur) &&
-[knop_verdieping(etage_3)]X(to_etage_1, to_etage_2, true, to_etage_4, deur) &&
-[knop_verdieping(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, true, deur) &&
+  to_etage_4: Bool = false) .
+[knop_verdieping(etage_1)]X(true, to_etage_2, to_etage_3, to_etage_4) &&
+[knop_verdieping(etage_2)]X(to_etage_1, true, to_etage_3, to_etage_4) &&
+[knop_verdieping(etage_3)]X(to_etage_1, to_etage_2, true, to_etage_4) &&
+[knop_verdieping(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, true) &&
 
-[verdieping_deur_open(etage_1)]X(false, to_etage_2, to_etage_3, to_etage_4, true) &&
-[verdieping_deur_open(etage_2)]X(to_etage_1, false, to_etage_3, to_etage_4, true) &&
-[verdieping_deur_open(etage_3)]X(to_etage_1, to_etage_2, false, to_etage_4, true) &&
-[verdieping_deur_open(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, false, true) &&
+[verdieping_deur_open(etage_1)]X(false, to_etage_2, to_etage_3, to_etage_4) &&
+[verdieping_deur_open(etage_2)]X(to_etage_1, false, to_etage_3, to_etage_4) &&
+[verdieping_deur_open(etage_3)]X(to_etage_1, to_etage_2, false, to_etage_4) &&
+[verdieping_deur_open(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, false) &&
 
-[lift_deur_open]X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, true) &&
-[lift_deur_dicht]X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, false) &&
+forall et:Verdieping.[verdieping_deur_dicht(et).tau]( val (!to_etage_1 && !to_etage_2 && !to_etage_3 && !to_etage_4 && et != etage_1) =>
+  X(true, to_etage_2, to_etage_3, to_etage_4)
+) &&
 
-exists ver1:Verdieping.exists ver2:Verdieping.
+% ( val (!to_etage_1 && !to_etage_2 && !to_etage_3 && !to_etage_4 && v != etage_1) =>
+%   []false
+% ) &&
+
+forall v:Verdieping.[verdieping_deur_dicht(v)]
+  ( val (!to_etage_1 && !to_etage_2 && !to_etage_3 && !to_etage_4 && v != etage_1)
+  => <(tau || accelereer(beneden) || lift_benadert(etage_3) || lift_benadert(etage_2))*.lift_benadert(etage_1).vertraag>true) &&
+  %  mu Y. (([tau || accelereer(beneden) || lift_benadert(etage_3) || lift_benadert(etage_2)]Y)&& <true>true) || <lift_benadert(etage_4).vertraag>true)
+
+
+
+forall ver1:Verdieping.forall ver2:Verdieping.forall ver3:Verdieping.
   [!verdieping_deur_open(ver1) &&
    !knop_verdieping(ver2) &&
-   !lift_deur_open &&
-   !lift_deur_dicht] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, deur) &&
+   !verdieping_deur_dicht(ver3)] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4)
 
-forall v:Verdieping.
-  [verdieping_deur_dicht(v)]<(!lift_benadert(etage_1) && !knop_verdieping(etage_1))*>
-  <lift_benadert(etage_1).vertraag>val (v != etage_1 || !to_etage_1 || !to_etage_2 || !to_etage_3 || !to_etage_4)
+% forall v:Verdieping.
+%   [verdieping_deur_dicht(v)]<(!lift_benadert(etage_1) && !knop_verdieping(etage_1))*>
+%   <lift_benadert(etage_1).vertraag>val (v != etage_1 || !to_etage_1 || !to_etage_2 || !to_etage_3 || !to_etage_4)
 
 % [lift_deur_dicht.(!lift_benadert(etage_1) && !knop_verdieping(etage_1))*]<lift_benadert(etage_1).vertraag>true
 %   [verdieping_deur_dicht(v)]<>
