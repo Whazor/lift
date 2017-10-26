@@ -72,11 +72,11 @@ act deursensor_trigger;
 
 proc DeurenComponent(opengaan: Bool, versnelling: Versnelling, deur: Deur, verdieping: Verdieping) =
   	 (versnelling == stilstaan && deur == gesloten) -> knop_deur_open . s_lift_deur_open . lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open)
-  	+ (versnelling == stilstaan && deur == open) -> knop_deur_dicht . lift_deur_dicht . verdieping_deur_dicht(verdieping) . s_lift_deur_dicht . DeurenComponent(deur=gesloten)
+  	+ (!opengaan && versnelling == stilstaan && deur == open) -> knop_deur_dicht . lift_deur_dicht . verdieping_deur_dicht(verdieping) . s_lift_deur_dicht . DeurenComponent(deur=gesloten)
     + r_accelereer . DeurenComponent(versnelling=constant)
     + sum v: Verdieping . r_stilstaan2(v) . DeurenComponent(versnelling=stilstaan,verdieping=v,opengaan=true)
-    + (opengaan && versnelling == stilstaan && deur==gesloten) -> s_lift_deur_open. lift_deur_open . verdieping_deur_open(verdieping) . s_verzoek_afgehandeld(verdieping) . DeurenComponent(deur=open, opengaan=false)
-    % + (opengaan && versnelling == stilstaan && deur==open) -> s_verzoek_afgehandeld(verdieping) . DeurenComponent(opengaan=false)
+    + (opengaan && versnelling == stilstaan && deur==gesloten) -> s_lift_deur_open. lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open)
+    + (opengaan && versnelling == stilstaan && deur==open) -> s_verzoek_afgehandeld(verdieping) . DeurenComponent(opengaan=false)
     % TODO: op twee punten kan de deur open, dus onderstaande regel klopt niet
     %+ deursensor_trigger . lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent()
     ;
@@ -86,7 +86,7 @@ proc DeurenComponent(opengaan: Bool, versnelling: Versnelling, deur: Deur, verdi
 proc StrategieComponent(tedoen: Set(Verdieping),versnelling: Versnelling, richting: Richting, huidig:Verdieping) =
     sum v: Verdieping.r_verdieping_verzoek(v).(v != huidig) -> StrategieComponent(tedoen = tedoen + {v}) <> StrategieComponent() +
     sum v: Verdieping.(versnelling == stilstaan && huidig != v && v in tedoen &&
-      tedoen * {andere : Verdieping | (v < huidig && v < andere) || (v > huidig && v > andere) } == {}
+      tedoen * {andere : Verdieping | (v < andere && andere < huidig) || (v > andere && andere > huidig) } == {}
       ) -> s_gaan(v, if(v < huidig, beneden, boven)).StrategieComponent(versnelling=constant) +
 
     (versnelling == constant) -> sum v:Verdieping. r_stilstaan1(v) . StrategieComponent(versnelling=stilstaan, huidig=v, tedoen = tedoen - {v})
