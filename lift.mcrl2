@@ -75,8 +75,8 @@ proc DeurenComponent(opengaan: Bool, versnelling: Versnelling, deur: Deur, verdi
   	+ (versnelling == stilstaan && deur == open) -> knop_deur_dicht . lift_deur_dicht . verdieping_deur_dicht(verdieping) . s_lift_deur_dicht . DeurenComponent(deur=gesloten)
     + r_accelereer . DeurenComponent(versnelling=constant)
     + sum v: Verdieping . r_stilstaan2(v) . DeurenComponent(versnelling=stilstaan,verdieping=v,opengaan=true)
-    + (opengaan && versnelling == stilstaan && deur==gesloten) -> s_lift_deur_open. lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open)
-    + (opengaan && versnelling == stilstaan && deur==open) -> s_verzoek_afgehandeld(verdieping) . DeurenComponent(opengaan=false)
+    + (opengaan && versnelling == stilstaan && deur==gesloten) -> s_lift_deur_open. lift_deur_open . verdieping_deur_open(verdieping) . s_verzoek_afgehandeld(verdieping) . DeurenComponent(deur=open, opengaan=false)
+    % + (opengaan && versnelling == stilstaan && deur==open) -> s_verzoek_afgehandeld(verdieping) . DeurenComponent(opengaan=false)
     % TODO: op twee punten kan de deur open, dus onderstaande regel klopt niet
     %+ deursensor_trigger . lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent()
     ;
