@@ -1,5 +1,8 @@
 % Wanneer de onderste of bovenste verdiepingssensor getriggerd wordt, dan moet de lift stoppen.
 % Na een lift_benadert(v) waarbij v nul of de hoogste verdieping is, moet er direct een vertraag actie komen.
 
-([true*.lift_benadert(etage_1)]<vertraag>true) &&
-([true*.lift_benadert(etage_4)]<vertraag>true)
+([true*.lift_benadert(etage_1)](mu Y.[!vertraag]Y && <true>true))
+&&
+([true*.lift_benadert(etage_4)](mu Y.[!vertraag]Y && <true>true))
+
+% (mu Y.[!vertraag]Y && <true>true)
