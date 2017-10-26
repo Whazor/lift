@@ -38,16 +38,12 @@ act deursensor_trigger;
   verdieping_deur_dicht: Verdieping;
   accelereer: Richting;
   vertraag;
-  %verdieping_verzoek: Verdieping;
-  %lift_oproep: Verdieping;
   knop_verdieping: Verdieping;
   knop_trigger_sos;
-  % knop_stop_sos;
   knop_deur_open;
   knop_deur_dicht;
 
   % tussen schachtmotor en strategie
-  %s_stop_bij, r_stop_bij, c_stop_bij: Verdieping;
   s_gaan, r_gaan, c_gaan: Verdieping # Richting;
   s_accelereer, r_accelereer, c_accelereer;
   % schachtmotor, deuren en strategie
@@ -82,12 +78,15 @@ proc DeurenComponent(opengaan: Bool, versnelling: Versnelling, deur: Deur, verdi
 
 %%%%%%%
 
-proc StrategieComponent(tedoen: Set(Verdieping),versnelling: Versnelling, richting: Richting, huidig:Verdieping) =
+proc StrategieComponent(tedoen: Set(Verdieping), versnelling: Versnelling, richting: Richting, huidig:Verdieping, gaan: Verdieping) =
     sum v: Verdieping.r_verdieping_verzoek(v).(v != huidig) -> StrategieComponent(tedoen = tedoen + {v}) <> StrategieComponent() +
     sum v: Verdieping.(versnelling == stilstaan && huidig != v && v in tedoen &&
-      tedoen * {andere : Verdieping | (v < andere && andere < huidig) || (v > andere && andere > huidig) } == {}
-      ) -> s_gaan(v, if(v < huidig, beneden, boven)).StrategieComponent(versnelling=constant) +
+      ((v > huidig && (richting == boven || {a : Verdieping | (a < huidig && a in tedoen)} == {}) && tedoen * {a : Verdieping | (v > a && a > huidig)} == {}) ||
+       (v < huidig && (richting == beneden || {a : Verdieping | (a > huidig && a in tedoen)} == {}) && tedoen * {a : Verdieping | (v < a && a < huidig)} == {}))
+          % tedoen * {andere : Verdieping | (v < andere && andere < huidig) || (v > andere && andere > huidig) } == {} &&
+      ) -> s_gaan(v, if(v < huidig, beneden, boven)).StrategieComponent(versnelling=constant, richting=if(v < huidig, beneden, boven), gaan=v) +
 
+    % (versnelling == constant) ->  +
     (versnelling == constant) -> sum v:Verdieping. r_stilstaan1(v) . StrategieComponent(versnelling=stilstaan, huidig=v, tedoen = tedoen - {v})
     ;
 
@@ -114,7 +113,7 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
   BeheerPaneel({}, huidige_verdieping) ||
   DeurenComponent(false, versnelling, deur, huidige_verdieping) ||
   SchachtMotor(false, false, huidige_verdieping, huidige_verdieping, deur, versnelling, richting) ||
-  StrategieComponent({},versnelling, richting, huidige_verdieping);
+  StrategieComponent({},versnelling, richting, huidige_verdieping, huidige_verdieping);
 
   init hide({
     c_gaan,
