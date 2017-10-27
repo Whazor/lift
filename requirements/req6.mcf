@@ -11,7 +11,12 @@ nu X (verd: Verdieping = etage_1, tedoen: Set(Verdieping) = {}) .
         forall v2:Verdieping.[lift_benadert(v2)] X(v2, tedoen) &&
         [lift_deur_open] X(verd, tedoen - {verd}) &&
 
-        forall v3:Verdieping.[lift_benadert(v3)] ( val (v3 in tedoen) => mu Y.([!vertraag]Y && <true>true) ) &&
+        forall v3:Verdieping.[lift_benadert(v3)] ( val (v3 in tedoen) =>
+        <vertraag>true
+          % mu Y.([!vertraag && !lift_benadert(etage_1) && !lift_benadert(etage_2) && !lift_benadert(etage_3) && !lift_benadert(etage_4)]Y &&
+          %   <!lift_benadert(etage_1) && !lift_benadert(etage_2) && !lift_benadert(etage_3) && !lift_benadert(etage_4)>true)
+            )
+           &&
 
         (forall ev1:Verdieping.
           forall ev2:Verdieping.

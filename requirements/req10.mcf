@@ -10,35 +10,33 @@ nu X (
     to_etage_1: Bool = false,
     to_etage_2: Bool = false,
     to_etage_3: Bool = false,
-    to_etage_4: Bool = false,
-    sos: Bool = false
+    to_etage_4: Bool = false
     ) .
 
-    [knop_verdieping(etage_1)]X(true, to_etage_2, to_etage_3, to_etage_4, sos) &&
-    [knop_verdieping(etage_2)]X(to_etage_1, true, to_etage_3, to_etage_4, sos) &&
-    [knop_verdieping(etage_3)]X(to_etage_1, to_etage_2, true, to_etage_4, sos) &&
-    [knop_verdieping(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, true, sos) &&
+    [knop_verdieping(etage_1)]X(true, to_etage_2, to_etage_3, to_etage_4) &&
+    [knop_verdieping(etage_2)]X(to_etage_1, true, to_etage_3, to_etage_4) &&
+    [knop_verdieping(etage_3)]X(to_etage_1, to_etage_2, true, to_etage_4) &&
+    [knop_verdieping(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, true) &&
 
-    [verdieping_deur_open(etage_1)]X(false, to_etage_2, to_etage_3, to_etage_4, sos) &&
-    [verdieping_deur_open(etage_2)]X(to_etage_1, false, to_etage_3, to_etage_4, sos) &&
-    [verdieping_deur_open(etage_3)]X(to_etage_1, to_etage_2, false, to_etage_4, sos) &&
-    [verdieping_deur_open(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, false, sos) &&
-
-    [knop_trigger_sos]X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, !sos) &&
+    [verdieping_deur_open(etage_1)]X(false, to_etage_2, to_etage_3, to_etage_4) &&
+    [verdieping_deur_open(etage_2)]X(to_etage_1, false, to_etage_3, to_etage_4) &&
+    [verdieping_deur_open(etage_3)]X(to_etage_1, to_etage_2, false, to_etage_4) &&
+    [verdieping_deur_open(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, false) &&
 
   forall v:Verdieping.[verdieping_deur_dicht(v)]
-    ( val ((
+    ( val (
       (v != etage_1 && to_etage_1) ||
       (v != etage_2 && to_etage_2) ||
       (v != etage_3 && to_etage_3) ||
-      (v != etage_4 && to_etage_4)) &&
-      !sos
+      (v != etage_4 && to_etage_4)
     ) =>
-      mu Y.(forall r: Richting.forall kver:Verdieping.[!accelereer(r) && !knop_verdieping(kver) && !knop_trigger_sos]Y && <true>true) &&
+      mu Y.(
+        forall r: Richting.
+        forall kver1:Verdieping.[!accelereer(r) && !knop_verdieping(kver1) && !knop_deur_open]Y &&
+        forall kver2:Verdieping.<!knop_verdieping(kver2) && !knop_deur_open>true)
+    )
+        &&
 
   forall ver1:Verdieping.forall ver2:Verdieping.
     [!verdieping_deur_open(ver1) &&
-     !knop_trigger_sos &&
-     !knop_verdieping(ver2)] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4, sos)
-)
-  % exists r:Richting.<tau*.accelereer(r)> val (deur==gesloten&&huidig!=etage_1&&!sos)
+     !knop_verdieping(ver2)] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4)
