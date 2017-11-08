@@ -1,6 +1,11 @@
 %De verdiepingsdeur kan alleen open als de lift stil staat op dezelfde verdieping van de deur.
 
 %De actie verdieping_deur_open(v) kan enkel gebeuren na de lift_benadert(v), vertraag en lift_deur_open (in deze volgorde).
+% forall v:Verdieping.forall v2:Verdieping.forall v3:Verdieping.
+%   [true* . lift_benadert(v) . (!lift_benadert(v2) && !vertraag)*.vertraag.verdieping_deur_open(v)] val (v == v3)
 
-forall v:Verdieping.
-   forall niv:Verdieping. [true* . lift_benadert(v) . vertraag . tau* . lift_deur_open . tau* . verdieping_deur_open(niv)] val (niv == v)
+
+nu X(huidig: Verdieping=etage_1).
+  forall v1:Verdieping.[lift_benadert(v1)]X(v1) &&
+  forall v2:Verdieping.[verdieping_deur_open(v2)] val(huidig == v2) &&
+  exists v3:Verdieping.[!lift_benadert(v3)] X(huidig)
