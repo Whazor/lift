@@ -1,1 +1,0 @@
-forall v:Verdieping . [true* . deursensor_trigger]<lift_deur_open><verdieping_deur_open(v)>true
