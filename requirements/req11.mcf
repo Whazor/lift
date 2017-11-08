@@ -1,0 +1,7 @@
+nu X (hasAccelerated: Bool=false) . (
+  [vertraag] (val(hasAccelerated == true) && X(false)) &&
+  forall r1:Richting .
+    [accelereer(r1)] X(true) &&
+  forall r2:Richting .
+    [!vertraag && !accelereer(r2)] X(hasAccelerated)
+)

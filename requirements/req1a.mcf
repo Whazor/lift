@@ -1,0 +1,3 @@
+forall v:Verdieping .
+  forall r:Richting .
+    [true* . verdieping_deur_open(v) . !verdieping_deur_dicht(v)* . accelereer(r)] false

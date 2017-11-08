@@ -1,0 +1,2 @@
+forall r:Richting .
+  [true* . lift_deur_open . !lift_deur_dicht . accelereer(r)] false
