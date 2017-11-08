@@ -1,7 +1,9 @@
 %De verdiepingsdeur gaat alleen dicht als de liftdeur ook dicht gaat.
 %Wanneer verdieping_deur_dicht(v) gebeurt, dan komt er direct een lift_deur_dicht actie, ook andersom
 
-  (forall v2:Verdieping.[true*.!verdieping_deur_dicht(v2).lift_deur_dicht] exists v:Verdieping.<verdieping_deur_dicht(v)>true) &&
-  (forall v2:Verdieping.[!lift_deur_dicht*.verdieping_deur_dicht(v2)]<lift_deur_dicht>true)
+forall v:Verdieping .
+  [!lift_deur_dicht* .verdieping_deur_dicht(v)]false
+
+%
 
 %TODO: probleem: laatste query is niet helemaal correct omdat er daarna het nog wel fout kan gaan
