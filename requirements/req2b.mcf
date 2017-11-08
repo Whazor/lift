@@ -1,5 +1,8 @@
 %De deurmotoren moeten de liftdeur openen wanneer de deursensor getriggerd is.
 
-nu X.(<true>X && [deursensor_trigger](mu Y. ([!lift_deur_open]Y && <true>true)))
+% nu X.(<true>X && [deursensor_trigger](mu Y. ([!lift_deur_open]Y && <true>true)))
 
+% [true*.deursensor_trigger.(!lift_deur_open && !lift_deur_dicht)*.lift_deur_dicht]false
+
+forall v:Verdieping.[true*.(lift_deur_gaat_dicht + verdieping_deur_gaat_dicht(v)) . tau* . deursensor_trigger] false %<deursensor_trigger> true
 %als de deur dicht gaat, dan moet het mogelijk zijn dat de deur weer open gaat. Dit moet direct na een deursensor_trigger (of deur knop open?)

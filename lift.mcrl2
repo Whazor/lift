@@ -42,8 +42,8 @@ act deursensor_trigger;
   knop_trigger_sos;
   knop_deur_open;
   knop_deur_dicht;
-  verdieping_deur_gaan_dicht : Verdieping;
-  lift_deur_gaan_dicht;
+  verdieping_deur_gaat_dicht : Verdieping;
+  lift_deur_gaat_dicht;
 
   % tussen schachtmotor en strategie
   s_gaan, r_gaan, c_gaan: Verdieping # Richting;
@@ -74,8 +74,7 @@ proc DeurenComponent(
   ) =
     (versnelling == stilstaan && deur == gesloten) -> knop_deur_open . s_lift_deur_open . DeurenComponent(deur=opengaan) +
     (deur == opengaan) -> lift_deur_open . verdieping_deur_open(verdieping) . DeurenComponent(deur=open) +
-    (deur == opengaan) -> knop_deur_dicht . DeurenComponent(deur=dichtgaan) +
-    (deur == open) -> knop_deur_dicht . DeurenComponent(deur=dichtgaan) +
+    (deur == opengaan || deur == open) -> knop_deur_dicht . lift_deur_gaat_dicht . verdieping_deur_gaat_dicht(verdieping) . DeurenComponent(deur=dichtgaan) +
 
     (deur == dichtgaan) -> (knop_deur_open + deursensor_trigger) . DeurenComponent(deur=opengaan) +
     (deur == dichtgaan) -> lift_deur_dicht . verdieping_deur_dicht(verdieping) . s_lift_deur_dicht . DeurenComponent(deur=gesloten) +
