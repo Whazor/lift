@@ -12,7 +12,7 @@
 %   )
 
 forall v:Verdieping .
-  [knop_verdieping(v)] mu X . (
+  [true * . knop_verdieping(v)] mu X . (
     [!lift_benadert(v)] X &&
     forall v2:Verdieping .
       nu Y . ([knop_verdieping(v2)]Y && [knop_trigger_sos]Y)
