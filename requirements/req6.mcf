@@ -7,19 +7,15 @@
 % vertraag -> interne acties (stilstaan)
 
 nu X (verd: Verdieping = etage_1, tedoen: Set(Verdieping) = {}) .
-        forall v1:Verdieping.[knop_verdieping(v1)] X(verd, tedoen + {v1} - {verd}) &&
+        forall v1:Verdieping.[c_gaan(v1)] X(verd, tedoen + {v1} - {verd}) &&
         forall v2:Verdieping.[lift_benadert(v2)] X(v2, tedoen) &&
         [lift_deur_open] X(verd, tedoen - {verd}) &&
 
         forall v3:Verdieping.[lift_benadert(v3)] ( val (v3 in tedoen) =>
-        <vertraag>true
-          % mu Y.([!vertraag && !lift_benadert(etage_1) && !lift_benadert(etage_2) && !lift_benadert(etage_3) && !lift_benadert(etage_4)]Y &&
-          %   <!lift_benadert(etage_1) && !lift_benadert(etage_2) && !lift_benadert(etage_3) && !lift_benadert(etage_4)>true)
-            )
-           &&
+        mu Y. ([!vertraag]Y && <true>true) && forall v4:Verdieping.[!vertraag*.lift_benadert(v4)]false ) &&
 
-        (forall ev1:Verdieping.
-          forall ev2:Verdieping.
-           [!knop_verdieping(ev1) &&
+        (exists ev1:Verdieping.
+          exists ev2:Verdieping.
+           [!c_gaan(ev1) &&
             !lift_benadert(ev2) &&
             !lift_deur_open] X(verd, tedoen))
