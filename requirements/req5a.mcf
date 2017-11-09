@@ -8,12 +8,11 @@
 %
 
 nu X (accelerating: Bool=false) . (
-  (
-    (val(accelerating == true) && <knop_trigger_sos>true) ||
-    (val(accelerating == false))
-  ) &&
+  val(accelerating) => <knop_trigger_sos>true &&
+
   [vertraag] X(false) &&
-  forall r1:Richting .
-    [accelereer(r1)] X(true) &&
+
+  forall r1:Richting . [accelereer(r1)] X(true) &&
+
   [!vertraag && !accelereer(boven) && !accelereer(beneden)] X(accelerating)
 )
