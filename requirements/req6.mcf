@@ -12,7 +12,7 @@ nu X (verd: Verdieping = etage_1, tedoen: Set(Verdieping) = {}) .
         [lift_deur_open] X(verd, tedoen - {verd}) &&
 
         forall v3:Verdieping.[lift_benadert(v3)] ( val (v3 in tedoen) =>
-          mu Y. ([!vertraag]Y && <true>true) && 
+          mu Y. ([!vertraag]Y && <true>true) &&
           forall v4:Verdieping.[!vertraag*.lift_benadert(v4)]false ) &&
 
         (exists r2:Richting.exists ev1:Verdieping.

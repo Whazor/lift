@@ -1,4 +1,5 @@
 import sys, subprocess, re
+import pexpect
 
 ##
 ## read log into memory, requires removal of dead paths
@@ -29,7 +30,6 @@ print(len(store))
 ###
 ### now simulate path onto lift.lps
 ###
-import pexpect
 child = pexpect.spawnu('lpssim lift.lps')
 
 child.expect('\?')
