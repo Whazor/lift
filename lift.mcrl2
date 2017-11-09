@@ -56,7 +56,10 @@ act deursensor_trigger;
   % beheerpaneel
   s_verzoek_afgehandeld, r_verzoek_afgehandeld, c_verzoek_afgehandeld: Verdieping;
   s_verdieping_verzoek, r_verdieping_verzoek, c_verdieping_verzoek: Verdieping;
+
+  s_huidige_verdieping, r_huidige_verdieping, c_huidige_verdieping: Verdieping;
   %s_lift_oproep, r_lift_oproep, c_lift_oproep;
+
 
 %%%%%%%
   proc
@@ -93,17 +96,20 @@ proc StrategieComponent(
   gaan: Verdieping) =
     sum v: Verdieping.r_verdieping_verzoek(v).(v != huidig) ->
       StrategieComponent(tedoen = tedoen + {v}) <> StrategieComponent() +
-    sum v: Verdieping.(versnelling == stilstaan && huidig != v && v in tedoen &&
+    % versnelling == stilstaan &&
+    sum v: Verdieping.(!(huidig in tedoen) && huidig != v && v != gaan && v in tedoen &&
       ((v > huidig && (richting == boven || {a : Verdieping | (a < huidig && a in tedoen)} == {}) &&
           tedoen * {a : Verdieping | (v > a && a > huidig)} == {}) ||
        (v < huidig && (richting == beneden || {a : Verdieping | (a > huidig && a in tedoen)} == {}) &&
           tedoen * {a : Verdieping | (v < a && a < huidig)} == {}))
       ) -> s_gaan(v, if(v < huidig, beneden, boven)).
         StrategieComponent(versnelling=constant, richting=if(v < huidig, beneden, boven), gaan=v) +
-
+    sum v:Verdieping.r_huidige_verdieping(v).StrategieComponent(huidig=v) +
     (versnelling == constant) ->
       sum v:Verdieping. r_stilstaan1(v) . s_verzoek_afgehandeld(v) .
-        StrategieComponent(versnelling=stilstaan, huidig=v, tedoen = tedoen - {v})
+        StrategieComponent(versnelling=stilstaan, huidig=v, tedoen = tedoen - {v}) +
+    (versnelling == constant && huidig in tedoen && huidig != gaan) ->
+     s_gaan(huidig, richting) . StrategieComponent(gaan=huidig)
     ;
 
 %%%%%%%
@@ -119,13 +125,17 @@ proc SchachtMotor(gaan:Bool, sos:Bool,
     + r_lift_deur_open . SchachtMotor(deur = open)
     + r_lift_deur_dicht . SchachtMotor(deur = gesloten)
     % lift_benadert sensor afvangen
-    + (versnelling == constant && !niet_verder(huidig, richting)) -> lift_benadert(next(huidig, richting)) .
+    + (versnelling == constant && stop_bij != huidig && !niet_verder(huidig, richting)) -> lift_benadert(next(huidig, richting)) .
       % moet stoppen bij juiste verdieping
       (next(huidig, richting) == stop_bij) ->
           % deur open, anders gaat de lift weer weg zonder ooit de deur te openen
           vertraag.s_stilstaan(next(huidig, richting)).
             SchachtMotor(gaan = false, deur=open, versnelling = stilstaan, huidig=next(huidig, richting))
-          <> SchachtMotor(huidig=next(huidig, richting))
+          <> s_huidige_verdieping(next(huidig, richting)).SchachtMotor(huidig=next(huidig, richting))
+
+    + (versnelling == constant && stop_bij == huidig) -> vertraag.
+      s_stilstaan(huidig).SchachtMotor(gaan = false, deur=open, versnelling = stilstaan, huidig=huidig)
+
     + (!sos && versnelling == constant) -> knop_trigger_sos .vertraag . SchachtMotor(versnelling=stilstaan, sos=true)
     + (sos) -> knop_trigger_sos . SchachtMotor(versnelling=stilstaan, sos=false);
 
@@ -136,14 +146,15 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
   SchachtMotor(false, false, huidige_verdieping, huidige_verdieping, deur, versnelling, richting) ||
   StrategieComponent({},versnelling, richting, huidige_verdieping, huidige_verdieping);
 
-  init hide({
-    c_gaan,
+  init
+    hide({
     c_accelereer,
     c_stilstaan,
     c_lift_deur_open,
     c_lift_deur_dicht,
     c_verzoek_afgehandeld,
-    c_verdieping_verzoek
+    c_huidige_verdieping
+
   }
     ,allow({
     deursensor_trigger,
@@ -163,15 +174,14 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
     knop_deur_dicht,
     lift_deur_gaat_dicht,
     verdieping_deur_gaat_dicht,
-    %c_stop_bij,
-    c_gaan,
+    % c_gaan,
     c_accelereer,
     c_stilstaan,
     c_lift_deur_open,
     c_lift_deur_dicht,
     c_verzoek_afgehandeld,
-    c_verdieping_verzoek
-    %c_lift_oproep
+    c_verdieping_verzoek,
+    c_huidige_verdieping
     },
          comm({
            %s_stop_bij|r_stop_bij->c_stop_bij,
@@ -181,7 +191,8 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
            s_lift_deur_open|r_lift_deur_open->c_lift_deur_open,
            s_lift_deur_dicht|r_lift_deur_dicht->c_lift_deur_dicht,
            s_verzoek_afgehandeld|r_verzoek_afgehandeld->c_verzoek_afgehandeld,
-           s_verdieping_verzoek|r_verdieping_verzoek->c_verdieping_verzoek
+           s_verdieping_verzoek|r_verdieping_verzoek->c_verdieping_verzoek,
+           s_huidige_verdieping|r_huidige_verdieping -> c_huidige_verdieping
            %s_lift_oproep|r_lift_oproep->c_lift_oproep
            },
            LiftController(etage_1, boven, stilstaan, gesloten)
