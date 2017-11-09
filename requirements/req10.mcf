@@ -30,11 +30,11 @@ nu X (
       (v != etage_3 && to_etage_3) ||
       (v != etage_4 && to_etage_4)
     ) =>
-      mu Y.(
-        forall r: Richting.
-        forall kver1:Verdieping.[!accelereer(r) && !knop_verdieping(kver1) && !knop_deur_open]Y &&
-        forall kver2:Verdieping.<!knop_verdieping(kver2) && !knop_deur_open>true)
-    )
+      nu Z . mu Y.(
+        [!accelereer(boven) && !accelereer(beneden) && !lift_deur_open]Y &&
+        [lift_deur_open] Z &&
+        <true>true)
+      )
         &&
 
   forall ver1:Verdieping.forall ver2:Verdieping.
