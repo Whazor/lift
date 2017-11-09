@@ -154,7 +154,6 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
     c_lift_deur_dicht,
     c_verzoek_afgehandeld,
     c_huidige_verdieping
-
   }
     ,allow({
     deursensor_trigger,
@@ -174,7 +173,7 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
     knop_deur_dicht,
     lift_deur_gaat_dicht,
     verdieping_deur_gaat_dicht,
-    % c_gaan,
+    c_gaan,
     c_accelereer,
     c_stilstaan,
     c_lift_deur_open,
