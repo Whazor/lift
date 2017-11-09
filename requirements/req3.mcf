@@ -5,29 +5,8 @@
 
 forall v:Verdieping .
   [true*.knop_verdieping(v)]
-
-      mu X . nu Y(sos:Bool = false, deur:Bool = false) .  (
-
-        val (!sos && !deur) => [!lift_benadert(v)] X &&
-
-        val (!sos) => [knop_trigger_sos] Y(true, deur) &&
-        val (sos) => [knop_trigger_sos] Y(false, deur) &&
-        % [lift_deur_open] Y(sos, deur) &&
-        %
-        % [lift_deur_open] Y(sos, deur) &&
-
-        % forall v2:Verdieping .
-        [knop_trigger_sos . !knop_trigger_sos* . knop_trigger_sos] Y(false, deur) &&
-        [deursensor_trigger . !lift_deur_dicht* . lift_deur_dicht] Y(sos, false) &&
+      nu Y . mu X . (
+        [!lift_benadert(v) && !knop_trigger_sos && !lift_deur_open] X &&
+        [knop_trigger_sos || lift_deur_open]Y &&
         <true>true
     )
-
-% mu X.([!lift_benadert(v)]X && <true>true)
-% this works, but lift_benadert doesn't neccessarily happens in an finite amount of steps since the sos and door openings can be
-% performed indefinitely meaning there is a cycle
-
-% the && are performed every recursion
-% We recurse until [!lift_benadert] is empty, which happens when we get a lift_benadert, then the left hand is true, and the right must still be true
-
-
-% mu Y.(<verdieping_deur_open(v)><lift_deur_open>true || <true>Y) || <true>X)
