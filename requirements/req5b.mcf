@@ -7,7 +7,7 @@
 %   % [knop_trigger_sos]<vertraag.exists r:Richting.!(knop_trigger_sos && !accelereer(r))*.knop_trigger_sos>true
 %
 
-[knop_trigger_sos] mu Y . ( [!vertraag]Y && <true>true )
+[true* . knop_trigger_sos] mu Y . ( [!vertraag]Y && <true>true )
 
 % nu X (accelerating: Bool=false) . (
 %   [knop_trigger_sos] mu Y . ( [!vertraag]Y && <true>true ) &&
