@@ -104,7 +104,7 @@ proc StrategieComponent(
           tedoen * {a : Verdieping | (v < a && a < huidig)} == {}))
       ) -> s_gaan(v, if(v < huidig, beneden, boven)).
         StrategieComponent(versnelling=constant, richting=if(v < huidig, beneden, boven), gaan=v) +
-    sum v:Verdieping.r_huidige_verdieping(v).StrategieComponent(huidig=v) +
+    sum v:Verdieping.(v != huidig) -> r_huidige_verdieping(v).StrategieComponent(huidig=v) +
     (versnelling == constant) ->
       sum v:Verdieping. r_stilstaan1(v) . s_verzoek_afgehandeld(v) .
         StrategieComponent(versnelling=stilstaan, huidig=v, tedoen = tedoen - {v}) +
