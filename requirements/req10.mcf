@@ -37,6 +37,6 @@ nu X (
       )
         &&
 
-  forall ver1:Verdieping.forall ver2:Verdieping.
+  exists ver1:Verdieping.exists ver2:Verdieping.
     [!verdieping_deur_open(ver1) &&
      !knop_verdieping(ver2)] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4)
