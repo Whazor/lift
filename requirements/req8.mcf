@@ -2,8 +2,9 @@
 %Wanneer verdieping_deur_dicht(v) gebeurt, dan komt er direct een lift_deur_dicht actie, ook andersom
 
 forall v:Verdieping .
-  [!lift_deur_dicht* .verdieping_deur_dicht(v)]false
+  [!lift_deur_dicht* . verdieping_deur_dicht(v)]false &&
 
-%
+forall v1:Verdieping . 
+  [!lift_deur_open* . verdieping_deur_open(v1)]false
 
 %TODO: probleem: laatste query is niet helemaal correct omdat er daarna het nog wel fout kan gaan
