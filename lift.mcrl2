@@ -39,6 +39,7 @@ act deursensor_trigger;
   accelereer: Richting;
   vertraag;
   knop_verdieping: Verdieping;
+  bevestig_verdieping: Verdieping;
   knop_trigger_sos;
   knop_deur_open;
   knop_deur_dicht;
@@ -118,7 +119,7 @@ proc SchachtMotor(gaan:Bool, sos:Bool,
                   huidig: Verdieping, stop_bij: Verdieping,
                   deur: Deur, versnelling: Versnelling,
                   richting: Richting) =
-    sum v:Verdieping . sum new_richting: Richting . r_gaan(v, new_richting) .
+    sum v:Verdieping . sum new_richting: Richting . r_gaan(v, new_richting) . bevestig_verdieping(v) .
       SchachtMotor(stop_bij = v, gaan = true, richting = new_richting)
     + (gaan && versnelling == stilstaan && deur == gesloten && !sos) -> s_accelereer.
       accelereer(richting).SchachtMotor(versnelling = constant, richting = richting)
@@ -155,7 +156,9 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
     c_lift_deur_open,
     c_lift_deur_dicht,
     c_verzoek_afgehandeld,
-    c_huidige_verdieping
+    c_huidige_verdieping,
+    c_verdieping_verzoek,
+    c_gaan
   }
     ,allow({
     deursensor_trigger,
@@ -175,6 +178,7 @@ proc LiftController(huidige_verdieping: Verdieping, richting: Richting, versnell
     knop_deur_dicht,
     lift_deur_gaat_dicht,
     verdieping_deur_gaat_dicht,
+    bevestig_verdieping,
     c_gaan,
     c_accelereer,
     c_stilstaan,
