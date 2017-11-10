@@ -4,15 +4,14 @@
 %   [lift_deur_open]
 
 forall v1:Verdieping .
-  [true*. lift_deur_open . !lift_deur_dicht* . verdieping_deur_dicht(v1)]false &&
+  [true*. lift_deur_open . !lift_deur_dicht* . verdieping_deur_dicht(v1)]false
+
+   &&
 
 forall v2:Verdieping .
-  [true*. lift_deur_dicht . !lift_deur_open* . verdieping_deur_open(v2)]false &&
+  [true*. lift_deur_dicht . !lift_deur_open* . verdieping_deur_open(v2)]false
+
+  &&
 
 forall v3:Verdieping .
   [!lift_deur_open* . verdieping_deur_open(v3)]false
-%
-% forall v1:Verdieping .
-%   [!lift_deur_open* . verdieping_deur_open(v1)]false
-
-%TODO: probleem: laatste query is niet helemaal correct omdat er daarna het nog wel fout kan gaan
