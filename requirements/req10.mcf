@@ -6,37 +6,16 @@
 %  als v > de huidige verdieping accelereer(boven)
 %  als v < huidige verdieping accelereer(beneden)
 
-nu X (
-    to_etage_1: Bool = false,
-    to_etage_2: Bool = false,
-    to_etage_3: Bool = false,
-    to_etage_4: Bool = false
-    ) .
+forall v:Verdieping.
+nu X (to_etage: Bool = false) .
+  [knop_verdieping(v)]X(true) &&
+  [verdieping_deur_open(v)]X(false) &&
 
-    [knop_verdieping(etage_1)]X(true, to_etage_2, to_etage_3, to_etage_4) &&
-    [knop_verdieping(etage_2)]X(to_etage_1, true, to_etage_3, to_etage_4) &&
-    [knop_verdieping(etage_3)]X(to_etage_1, to_etage_2, true, to_etage_4) &&
-    [knop_verdieping(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, true) &&
-
-    [verdieping_deur_open(etage_1)]X(false, to_etage_2, to_etage_3, to_etage_4) &&
-    [verdieping_deur_open(etage_2)]X(to_etage_1, false, to_etage_3, to_etage_4) &&
-    [verdieping_deur_open(etage_3)]X(to_etage_1, to_etage_2, false, to_etage_4) &&
-    [verdieping_deur_open(etage_4)]X(to_etage_1, to_etage_2, to_etage_3, false) &&
-
-  forall v:Verdieping.[verdieping_deur_dicht(v)]
-    ( val (
-      (v != etage_1 && to_etage_1) ||
-      (v != etage_2 && to_etage_2) ||
-      (v != etage_3 && to_etage_3) ||
-      (v != etage_4 && to_etage_4)
-    ) =>
+  forall v2:Verdieping.[verdieping_deur_dicht(v2)]
+    ( val (to_etage) =>
       nu Z . mu Y.(
         [!accelereer(boven) && !accelereer(beneden) && !lift_deur_open]Y &&
-        [lift_deur_open] Z &&
-        <true>true)
-      )
-        &&
+        [lift_deur_open] Z && <true>true)
+      ) &&
 
-  exists ver1:Verdieping.exists ver2:Verdieping.
-    [!verdieping_deur_open(ver1) &&
-     !knop_verdieping(ver2)] X(to_etage_1, to_etage_2, to_etage_3, to_etage_4)
+    [!verdieping_deur_open(v) && !knop_verdieping(v)] X(to_etage)
