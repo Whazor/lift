@@ -12,8 +12,13 @@
   % forall v:Verdieping [true*.lift_benadert(v)]
   %   exists v2:Verdieping . [(!trigger_knop_sos && !lift_benadert(v2))* . vertraag]
 
-  nu X(huidig:Verdieping = etage_1,sos:Bool=false) .
-    forall v1:Verdieping . [lift_benadert(v1)]X(v1,sos) &&
-    [knop_trigger_sos] X(huidig,!sos) &&
-    (val (!sos) => [vertraag]mu Y . ([!verdieping_deur_open(huidig)]Y && <true>true)) &&
-    exists v2:Verdieping. [!lift_benadert(v2) && !knop_trigger_sos && !vertraag]X(huidig,sos)
+nu X(huidig:Verdieping = etage_1,sos:Bool=false) .
+  forall v1:Verdieping .
+    [lift_benadert(v1)]X(v1,sos) &&
+  [knop_trigger_sos] X(huidig,!sos) &&
+
+  (val (!sos) => [vertraag]
+    mu Y . ([!verdieping_deur_open(huidig)]Y && <true>true)) &&
+
+  exists v2:Verdieping.
+    [!lift_benadert(v2) && !knop_trigger_sos && !vertraag]X(huidig,sos)
