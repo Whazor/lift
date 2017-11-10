@@ -6,20 +6,14 @@
 % Sequence: knop_verdieping(v) -> interne acties (verdieping_verzoek, verzoek_afgehandeld, gaan) -> accelereer(boven) of accelereer(beneden) -> lift_benadert(v) ->
 % vertraag -> interne acties (stilstaan)
 
-nu X (verd: Verdieping = etage_1, tedoen: Set(Verdieping) = {}) .
-  forall r1:Richting.forall v1:Verdieping.
-    [c_gaan(v1,r1)] X(verd, tedoen + {v1} - {verd}) &&
-  forall v2:Verdieping.
-    [lift_benadert(v2)] X(v2, tedoen) &&
-  [lift_deur_open] X(verd, tedoen - {verd}) &&
+forall v:Verdieping.
+  nu X(gaan: Bool=false, moet_vertragen:Bool = false) .
+  [bevestig_verdieping(v)]X(true, moet_vertragen) &&
 
-  forall v3:Verdieping. ( val (v3 in tedoen) =>
-      [lift_benadert(v3).!vertraag*.
-        (lift_benadert(etage_1) || lift_benadert(etage_2) ||
-         lift_benadert(etage_3) || lift_benadert(etage_4))
-      ]false) &&
+  % zet moet_vertragen alleen op true als gaan ook op true staat
+  [lift_benadert(v)]X(gaan, gaan) &&
 
-  (exists r2:Richting.exists ev1:Verdieping.
-    exists ev2:Verdieping.
-     [!c_gaan(ev1, r2) && !lift_benadert(ev2) && !lift_deur_open]
-      X(verd, tedoen))
+  forall v2:Verdieping.[lift_benadert(v2)] val (!moet_vertragen) &&
+  [vertraag] X(false, false) &&
+
+  [!bevestig_verdieping(v) && !lift_benadert(v) && !vertraag] X(gaan, moet_vertragen)
