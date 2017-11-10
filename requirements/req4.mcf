@@ -1,8 +1,19 @@
 %Wanneer de lift op een verdieping tot stilstand komt, worden de deuren geopend door de deurmotoren.
 
-forall v:Verdieping .
-  forall v2: Verdieping.
-  [ true* .
-    lift_benadert(v) .
-    (!lift_benadert(v2) && !knop_trigger_sos)* .
-    vertraag] mu X . ([!verdieping_deur_open(v)] X && <true>true)
+% forall v:Verdieping .
+%   [ true* .
+%     lift_benadert(v).
+%     (exists v2: Verdieping.!lift_benadert(v2) && !knop_trigger_sos)* .
+%     vertraag] mu X . ([!verdieping_deur_open(v)] X && <true>true)
+
+
+    % <true*.verdieping_deur_open(v)>true
+
+  % forall v:Verdieping [true*.lift_benadert(v)]
+  %   exists v2:Verdieping . [(!trigger_knop_sos && !lift_benadert(v2))* . vertraag]
+
+  nu X(huidig:Verdieping = etage_1,sos:Bool=false) .
+    forall v1:Verdieping . [lift_benadert(v1)]X(v1,sos) &&
+    [knop_trigger_sos] X(huidig,!sos) &&
+    (val (!sos) => [vertraag]mu Y . ([!verdieping_deur_open(huidig)]Y && <true>true)) &&
+    exists v2:Verdieping. [!lift_benadert(v2) && !knop_trigger_sos && !vertraag]X(huidig,sos)
