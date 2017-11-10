@@ -131,7 +131,9 @@ proc SchachtMotor(gaan:Bool, sos:Bool,
           % deur open, anders gaat de lift weer weg zonder ooit de deur te openen
           vertraag.s_stilstaan(next(huidig, richting)).
             SchachtMotor(gaan = false, deur=open, versnelling = stilstaan, huidig=next(huidig, richting))
-          <> s_huidige_verdieping(next(huidig, richting)).SchachtMotor(huidig=next(huidig, richting))
+          <> SchachtMotor(huidig=next(huidig, richting))
+
+    + s_huidige_verdieping(huidig).SchachtMotor()
 
     + (versnelling == constant && stop_bij == huidig) -> vertraag.
       s_stilstaan(huidig).SchachtMotor(gaan = false, deur=open, versnelling = stilstaan, huidig=huidig)
