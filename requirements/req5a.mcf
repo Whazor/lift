@@ -8,7 +8,7 @@
 %
 
 nu X (accelerating: Bool=false) . (
-  val(accelerating) => <knop_trigger_sos>true &&
+  (val(accelerating) => <knop_trigger_sos || vertraag>true) &&
 
   [vertraag] X(false) &&
 
